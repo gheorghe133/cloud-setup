@@ -1,17 +1,36 @@
 const axios = require("axios");
+const http = require("http");
 const https = require("https");
 const config = require("../../config/config");
 const logger = require("../../utils/logger");
+
+// Create reusable axios instance with proper HTTPS configuration
+const axiosInstance = axios.create({
+  timeout: 30000,
+  maxRedirects: 5,
+  validateStatus: () => true, // Accept all status codes
+  httpsAgent: new https.Agent({
+    rejectUnauthorized: false, // Allow self-signed certificates
+    keepAlive: true,
+    maxSockets: 50,
+  }),
+  httpAgent: new http.Agent({
+    keepAlive: true,
+    maxSockets: 50,
+  }),
+});
 
 class RoundRobinBalancer {
   constructor(servers = config.warehouseServers) {
     this.servers = servers.map((server) => {
       // Use HTTPS for port 443, HTTP otherwise
-      const protocol = server.port === 443 ? 'https' : 'http';
+      const protocol = server.port === 443 ? "https" : "http";
       // Don't include port in URL if it's the default port (80 for HTTP, 443 for HTTPS)
-      const portSuffix = (protocol === 'https' && server.port === 443) || (protocol === 'http' && server.port === 80)
-        ? ''
-        : `:${server.port}`;
+      const portSuffix =
+        (protocol === "https" && server.port === 443) ||
+        (protocol === "http" && server.port === 80)
+          ? ""
+          : `:${server.port}`;
       return {
         ...server,
         url: `${protocol}://${server.host}${portSuffix}`,
@@ -78,12 +97,6 @@ class RoundRobinBalancer {
         method: req.method,
         url: `${server.url}${req.originalUrl || req.url}`,
         headers: this.prepareHeaders(req),
-        timeout: config.loadBalancer.maxRetries * 1000,
-        validateStatus: () => true,
-        // Allow self-signed certificates for Railway internal networking
-        httpsAgent: new https.Agent({
-          rejectUnauthorized: false
-        })
       };
 
       if (req.method !== "GET" && req.body) {
@@ -96,7 +109,7 @@ class RoundRobinBalancer {
         serverUrl: server.url,
       });
 
-      const response = await axios(requestConfig);
+      const response = await axiosInstance(requestConfig);
       const responseTime = Date.now() - startTime;
 
       this.updateServerStats(server, true, responseTime);
@@ -224,11 +237,8 @@ class RoundRobinBalancer {
 
   async checkServerHealth(server) {
     try {
-      const response = await axios.get(`${server.url}/health`, {
+      const response = await axiosInstance.get(`${server.url}/health`, {
         timeout: config.loadBalancer.healthCheckTimeout,
-        httpsAgent: new https.Agent({
-          rejectUnauthorized: false
-        })
       });
 
       const wasUnhealthy = !server.isHealthy;

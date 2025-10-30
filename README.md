@@ -45,9 +45,27 @@ Migrarea proiectului Lab 2 (Web Proxy + Data Warehouse) în cloud folosind **Rai
 │  └────────────────────────────────────────────────────────┘  │
 └──────────────────────────────────────────────────────────────┘
 
-Note: Reverse Proxy code is implemented in src/proxy/ and can be
-deployed as a separate service or run locally for load balancing
-and caching features.
+---
+
+## 🚀 Deployment Status
+
+### Production (Railway Cloud):
+- **Data Warehouse API**: ✅ DEPLOYED & RUNNING
+  - URL: https://web-production-190d4.up.railway.app
+  - Status: Active
+  - Features: CRUD operations, JSON/XML support, Health monitoring
+
+### Local Development:
+- **Reverse Proxy**: ✅ IMPLEMENTED (code in src/proxy/)
+  - Features: Load balancing, Caching, Connection pooling
+  - Run locally: `npm run start:proxy`
+  - Can be deployed as separate Railway service if needed
+
+**Lab 3 Requirements**: ✅ COMPLETE
+- Cloud deployment: ✅ Railway
+- Application running: ✅ Data Warehouse API
+- Architecture diagram: ✅ Below
+- Documentation: ✅ Complete
 ```
 
 ## Servicii Deploy-ate
