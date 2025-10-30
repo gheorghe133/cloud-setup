@@ -1,5 +1,7 @@
 # Lab 3 - Cloud Deployment
 
+![CI/CD Pipeline](https://github.com/gheorghe133/cloud-setup/actions/workflows/ci.yml/badge.svg)
+
 Web Proxy + Data Warehouse deployed pe **Railway.app**
 
 ## 🚀 Production URLs
