@@ -9,6 +9,8 @@ Web Proxy + Data Warehouse deployed pe **Railway.app**
 ✅ **Data Warehouse:** https://data-warehouse.up.railway.app
 ✅ **Reverse Proxy:** https://reverse-proxy-server.up.railway.app
 
+**CI/CD Status:** Automated testing on every push ✅
+
 ## Arhitectură
 
 ```
