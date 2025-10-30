@@ -125,6 +125,7 @@ curl -v https://reverse-proxy-server.up.railway.app/employees 2>&1 | grep x-prox
 **Trigger:** Push to `main`/`develop`, Pull Requests
 
 **Jobs:**
+
 1. **Test** - Node.js 16.x, 18.x, 20.x
    - 17 unit tests (Employee Model + Service)
    - Coverage report generation
@@ -133,6 +134,7 @@ curl -v https://reverse-proxy-server.up.railway.app/employees 2>&1 | grep x-prox
 4. **Deploy Status** - Railway deployment info
 
 **Test Results:**
+
 ```
 Test Suites: 2 passed, 2 total
 Tests:       17 passed, 17 total
@@ -169,5 +171,13 @@ Tests:       17 passed, 17 total
 ## Punctaj Estimat
 
 **Sarcina de bază:** 8/10 puncte ✅
-**Sarcină adițională (CI/CD):** +1 punct ✅
+**Sarcină adițională (CI/CD Pipeline):** +1 punct ✅
 **Total:** **9/10 puncte**
+
+---
+
+## Commit History
+
+- `Add CI/CD Pipeline with GitHub Actions` - Implementare CI/CD cu 17 teste
+- `Cleanup documentation - keep only essentials` - Simplificare documentație
+- `Update README with final deployment URLs` - URLs finale production
