@@ -226,6 +226,9 @@ class RoundRobinBalancer {
     try {
       const response = await axios.get(`${server.url}/health`, {
         timeout: config.loadBalancer.healthCheckTimeout,
+        httpsAgent: new https.Agent({
+          rejectUnauthorized: false
+        })
       });
 
       const wasUnhealthy = !server.isHealthy;
@@ -245,6 +248,7 @@ class RoundRobinBalancer {
         logger.warn("Server health check failed", {
           url: server.url,
           error: error.message,
+          errorCode: error.code,
         });
       }
     }
