@@ -50,13 +50,17 @@ Migrarea proiectului Lab 2 (Web Proxy + Data Warehouse) în cloud folosind **Rai
 ## 🚀 Deployment Status
 
 ### Production (Railway Cloud):
-- **Data Warehouse API**: ✅ DEPLOYED & RUNNING
-  - URL: https://web-production-190d4.up.railway.app
-  - Status: Active
-  - Features: CRUD operations, JSON/XML support, Health monitoring
 
-### Local Development:
-- **Reverse Proxy**: ✅ IMPLEMENTED (code in src/proxy/)
+✅ **Data Warehouse API** - DEPLOYED & RUNNING
+- URL: https://data-warehouse.up.railway.app
+- Status: Active
+- Features: CRUD operations, JSON/XML support, Health monitoring
+
+✅ **Reverse Proxy Server** - DEPLOYED & RUNNING
+- URL: https://reverse-proxy-server.up.railway.app
+- Status: Active
+- Features: Load balancing, Response caching, Health checks
+- Backend: Private networking to Data Warehouse (web:8080)
   - Features: Load balancing, Caching, Connection pooling
   - Run locally: `npm run start:proxy`
   - Can be deployed as separate Railway service if needed
@@ -135,22 +139,29 @@ PORT=$PORT  # Railway setează automat
 
 ```bash
 NODE_ENV=production
-PORT=$PORT  # Railway setează automat (dinamic)
+# PORT is set automatically by Railway to 8080
 ```
 
-### Reverse Proxy Service (Local)
+### Reverse Proxy Service (Production)
 
 ```bash
+NODE_ENV=production
+PORT=8080
+PROXY_HOST=0.0.0.0
+DW_SERVERS=web:8080  # Private networking to Data Warehouse
+```
+
+### Local Development
+
+```bash
+# Warehouse
+NODE_ENV=development
+DW_PORT=3000
+
+# Proxy
 NODE_ENV=development
 PROXY_PORT=8080
 DW_SERVERS=localhost:3000
-```
-
-Pentru deployment proxy pe Railway (opțional):
-```bash
-NODE_ENV=production
-PORT=$PORT
-DW_SERVERS=web-production-190d4.up.railway.app:443
 ```
 
 ## Testing
@@ -158,27 +169,39 @@ DW_SERVERS=web-production-190d4.up.railway.app:443
 ### Test Data Warehouse Direct
 
 ```bash
-# GET all employees
-curl https://warehouse-service.up.railway.app/employees
+# Health check
+curl https://data-warehouse.up.railway.app/health
 
-# GET specific employee
-curl https://warehouse-service.up.railway.app/employees/1
+# GET all employees
+curl https://data-warehouse.up.railway.app/employees
+
+# GET specific employee (JSON)
+curl https://data-warehouse.up.railway.app/employees/1
+
+# GET employee (XML format)
+curl -H "Accept: application/xml" https://data-warehouse.up.railway.app/employees/1
 
 # CREATE employee
-curl -X PUT https://warehouse-service.up.railway.app/employees/1 \
+curl -X PUT https://data-warehouse.up.railway.app/employees/new-id \
   -H "Content-Type: application/json" \
-  -d '{"name":"John Doe","position":"Developer","salary":50000}'
+  -d '{"firstName":"John","lastName":"Doe","email":"john@example.com","department":"IT","position":"Developer","salary":50000}'
 ```
 
-### Test prin Proxy
+### Test prin Reverse Proxy
 
 ```bash
-# Request prin proxy (cu caching)
-curl https://proxy-service.up.railway.app/employees
+# Proxy health check
+curl https://reverse-proxy-server.up.railway.app/proxy/health
 
-# Verifică cache HIT
-curl -v https://proxy-service.up.railway.app/employees
-# Caută header: X-Cache: HIT
+# GET employees prin proxy (cu caching)
+curl https://reverse-proxy-server.up.railway.app/employees
+
+# Verifică cache headers
+curl -v https://reverse-proxy-server.up.railway.app/employees 2>&1 | grep -i "x-proxy-cache"
+# Output: x-proxy-cache: HIT (dacă e cached)
+
+# Proxy stats
+curl https://reverse-proxy-server.up.railway.app/proxy/stats
 ```
 
 ## Monitoring
@@ -187,16 +210,19 @@ curl -v https://proxy-service.up.railway.app/employees
 
 - **Logs**: Real-time logs pentru fiecare service
 - **Metrics**: CPU, Memory, Network usage
-- **Deployments**: Istoric deploy-uri
+- **Deployments**: Istoric deploy-uri cu auto-deploy pe push
 
 ### Health Checks
 
 ```bash
 # Check warehouse health
-curl https://warehouse-service.up.railway.app/health
+curl https://data-warehouse.up.railway.app/health
 
 # Check proxy health
-curl https://proxy-service.up.railway.app/health
+curl https://reverse-proxy-server.up.railway.app/proxy/health
+
+# Check load balancer stats
+curl https://reverse-proxy-server.up.railway.app/proxy/stats
 ```
 
 ## Cost Estimation
@@ -209,9 +235,8 @@ Railway Free Tier:
 
 Servicii folosite:
 
-- Data Warehouse: ~$2/lună
-- Proxy: ~$2/lună
-- Redis: ~$1/lună
+- Data Warehouse: ~$2.50/lună
+- Reverse Proxy: ~$2.50/lună
 - **Total**: ~$5/lună (GRATUIT cu credit)
 
 ## Troubleshooting
