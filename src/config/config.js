@@ -2,7 +2,6 @@ const config = {
   warehouse: {
     port: process.env.PORT || process.env.DW_PORT || 3000,
     host: process.env.DW_HOST || "0.0.0.0",
-    maxConnections: process.env.DW_MAX_CONNECTIONS || 100,
     requestTimeout: process.env.DW_REQUEST_TIMEOUT || 30000,
   },
 
@@ -20,7 +19,6 @@ const config = {
   },
 
   loadBalancer: {
-    algorithm: process.env.LB_ALGORITHM || "round-robin",
     healthCheckInterval: process.env.LB_HEALTH_CHECK_INTERVAL || 30000,
     healthCheckTimeout: process.env.LB_HEALTH_CHECK_TIMEOUT || 5000,
     maxRetries: process.env.LB_MAX_RETRIES || 3,
@@ -40,7 +38,6 @@ const config = {
   logging: {
     level: process.env.LOG_LEVEL || "info",
     format: process.env.LOG_FORMAT || "combined",
-    file: process.env.LOG_FILE || null,
   },
 
   security: {
@@ -55,7 +52,6 @@ const config = {
 
   env: process.env.NODE_ENV || "development",
   isDevelopment: process.env.NODE_ENV !== "production",
-  isProduction: process.env.NODE_ENV === "production",
 };
 
 module.exports = config;

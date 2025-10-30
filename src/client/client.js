@@ -238,7 +238,8 @@ class TestClient {
 }
 
 if (require.main === module) {
-  const client = new TestClient();
+  const productionProxyUrl = "https://reverse-proxy-server.up.railway.app";
+  const client = new TestClient(productionProxyUrl);
 
   const args = process.argv.slice(2);
   const testType = args[0] || "all";

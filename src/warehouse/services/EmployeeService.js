@@ -247,10 +247,6 @@ class EmployeeService {
     }
   }
 
-  async getEmployeesByDepartment(department) {
-    return this.searchEmployees({ department });
-  }
-
   async getStatistics() {
     try {
       const totalEmployees = await this.storage.size();

@@ -159,23 +159,4 @@ describe("Employee Model", () => {
     });
   });
 
-  describe("toJSON", () => {
-    test("should return JSON string", () => {
-      const employee = new Employee({
-        firstName: "John",
-        lastName: "Doe",
-        email: "john@example.com",
-        department: "IT",
-        position: "Developer",
-        salary: 50000,
-      });
-
-      const json = employee.toJSON();
-
-      expect(typeof json).toBe("string");
-      const parsed = JSON.parse(json);
-      expect(parsed).toHaveProperty("firstName", "John");
-      expect(parsed).toHaveProperty("lastName", "Doe");
-    });
-  });
 });

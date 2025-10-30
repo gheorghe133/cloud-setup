@@ -65,10 +65,6 @@ class ConnectionManager {
     }
   }
 
-  getConnection(connectionId) {
-    return this.connections.get(connectionId) || null;
-  }
-
   closeConnection(connectionId) {
     const connection = this.connections.get(connectionId);
 
@@ -134,18 +130,6 @@ class ConnectionManager {
       avgResponseTime: Math.round(pool.avgResponseTime),
       errorCount: pool.errorCount,
     });
-  }
-
-  getConnectionsByIP(clientIP) {
-    const connections = [];
-
-    for (const connection of this.connections.values()) {
-      if (connection.clientInfo.ip === clientIP) {
-        connections.push(connection);
-      }
-    }
-
-    return connections;
   }
 
   getActiveConnectionsCount() {
