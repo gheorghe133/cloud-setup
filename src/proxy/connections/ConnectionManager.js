@@ -1,4 +1,5 @@
 const { v4: uuidv4 } = require("uuid");
+
 const config = require("../../config/config");
 const logger = require("../../utils/logger");
 
@@ -185,7 +186,6 @@ class ConnectionManager {
     stats.uniqueClientIPs = stats.clientIPs.size;
     stats.uniqueUserAgents = stats.userAgents.size;
 
-    // Convert Sets to arrays for JSON serialization
     stats.clientIPs = Array.from(stats.clientIPs);
     stats.userAgents = Array.from(stats.userAgents);
 
@@ -234,7 +234,7 @@ class ConnectionManager {
   startCleanupProcess() {
     this.cleanupInterval = setInterval(() => {
       this.cleanupExpiredConnections();
-    }, 60000); // Run every minute
+    }, 60000);
 
     logger.info("Connection cleanup process started");
   }

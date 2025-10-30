@@ -1,16 +1,16 @@
 const axios = require("axios");
 const http = require("http");
 const https = require("https");
+
 const config = require("../../config/config");
 const logger = require("../../utils/logger");
 
-// Create reusable axios instance with proper HTTPS configuration
 const axiosInstance = axios.create({
   timeout: 30000,
   maxRedirects: 5,
-  validateStatus: () => true, // Accept all status codes
+  validateStatus: () => true,
   httpsAgent: new https.Agent({
-    rejectUnauthorized: false, // Allow self-signed certificates
+    rejectUnauthorized: false,
     keepAlive: true,
     maxSockets: 50,
   }),
@@ -23,9 +23,7 @@ const axiosInstance = axios.create({
 class RoundRobinBalancer {
   constructor(servers = config.warehouseServers) {
     this.servers = servers.map((server) => {
-      // Use HTTPS for port 443, HTTP otherwise
       const protocol = server.port === 443 ? "https" : "http";
-      // Don't include port in URL if it's the default port (80 for HTTP, 443 for HTTPS)
       const portSuffix =
         (protocol === "https" && server.port === 443) ||
         (protocol === "http" && server.port === 80)
