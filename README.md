@@ -2,25 +2,40 @@
 
 Migrarea proiectului Lab 2 (Web Proxy + Data Warehouse) în cloud folosind **Railway.app**.
 
-## Arhitectură Cloud
+## Arhitectură Cloud - DEPLOYED ✅
 
 ```
-┌─────────────────────────────────────────────────────┐
-│ Railway Cloud Platform                              │
-│                                                      │
-│  ┌────────────────────┐      ┌───────────────────┐ │
-│  │ Service 1          │      │ Service 2         │ │
-│  │ Data Warehouse     │◄─────┤ Reverse Proxy     │ │
-│  │ Port: $PORT        │      │ Port: $PORT       │ │
-│  │ Node.js + Express  │      │ Load Balancer     │ │
-│  └────────────────────┘      └───────────────────┘ │
-│           ▲                           ▲             │
-│           │                           │             │
-│  ┌────────┴────────┐         ┌────────┴──────────┐ │
-│  │ Redis Database  │         │ Public URL        │ │
-│  │ (Managed)       │         │ https://...       │ │
-│  └─────────────────┘         └───────────────────┘ │
-└─────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│ Railway Cloud Platform                                       │
+│                                                               │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │ Service: web-production-190d4                          │  │
+│  │ ├─ Data Warehouse API                                  │  │
+│  │ ├─ Runtime: Node.js 16+                                │  │
+│  │ ├─ Port: $PORT (auto-assigned)                         │  │
+│  │ ├─ Host: 0.0.0.0                                       │  │
+│  │ └─ Status: ✅ RUNNING                                  │  │
+│  └────────────────────────────────────────────────────────┘  │
+│                              ▲                                │
+│                              │                                │
+│  ┌───────────────────────────┴─────────────────────────────┐ │
+│  │ Public URL (HTTPS)                                      │ │
+│  │ https://web-production-190d4.up.railway.app             │ │
+│  │ ├─ GET  /health                                         │ │
+│  │ ├─ GET  /employees                                      │ │
+│  │ ├─ GET  /employees/:id                                  │ │
+│  │ ├─ PUT  /employees/:id                                  │ │
+│  │ ├─ POST /employees/:id                                  │ │
+│  │ └─ DELETE /employees/:id                                │ │
+│  └─────────────────────────────────────────────────────────┘ │
+│                                                               │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │ GitHub Integration                                     │  │
+│  │ Repository: gheorghe133/cloud-setup                    │  │
+│  │ Branch: main                                           │  │
+│  │ Auto-deploy: ✅ Enabled                                │  │
+│  └────────────────────────────────────────────────────────┘  │
+└──────────────────────────────────────────────────────────────┘
 ```
 
 ## Servicii Deploy-ate
@@ -235,19 +250,75 @@ Servicii folosite:
 # Verifică că host e "0.0.0.0" nu "localhost"
 ```
 
+## ✅ Deployment Status - LIVE
+
+**🌐 Production URL:** https://web-production-190d4.up.railway.app
+
+**📊 Service Status:**
+- ✅ Health Check: `GET /health` - **HEALTHY**
+- ✅ API Endpoints: **OPERATIONAL**
+- ✅ Data Warehouse: **5 employees loaded**
+- ✅ Auto-deploy from GitHub: **ENABLED**
+- ✅ HTTPS: **Enabled by default**
+- ✅ Uptime: **Running continuously**
+
+**🧪 Teste Verificate:**
+```bash
+# Health check
+curl https://web-production-190d4.up.railway.app/health
+# Response: {"status":"healthy","uptime":305.88,"version":"1.0.0"}
+
+# Get all employees
+curl https://web-production-190d4.up.railway.app/employees
+# Response: 5 employees returned successfully
+
+# Get specific employee
+curl https://web-production-190d4.up.railway.app/employees/1
+# Response: John Doe - Software Engineer
+
+# Create new employee
+curl -X PUT https://web-production-190d4.up.railway.app/employees/100 \
+  -H "Content-Type: application/json" \
+  -d '{"firstName":"Ion","lastName":"Popescu","email":"ion@company.com","department":"IT","position":"DevOps","salary":70000}'
+
+# Update employee
+curl -X POST https://web-production-190d4.up.railway.app/employees/100 \
+  -H "Content-Type: application/json" \
+  -d '{"salary":75000}'
+
+# Delete employee
+curl -X DELETE https://web-production-190d4.up.railway.app/employees/100
+```
+
+**📈 Deployment Info:**
+- **Platform:** Railway.app (PaaS)
+- **Region:** Auto-selected (US/EU)
+- **Runtime:** Node.js 16+
+- **Build Tool:** Nixpacks (auto-detected)
+- **Deploy Method:** GitHub integration
+- **Repository:** https://github.com/gheorghe133/cloud-setup
+- **Branch:** main
+- **Auto-deploy:** ✅ Enabled (push to main = auto deploy)
+
+---
+
 ## Sarcini Lab 3 Completate
 
-- [x] **Sarcina de bază (Opțiunea 2)**: Migrare proiect în Cloud
+### ✅ **Sarcina de bază (Opțiunea 2) - 8 puncte**: Migrare proiect în Cloud
 
-  - [x] Creat instanțe virtuale (Railway services)
-  - [x] Copiat aplicații pe instanțe
-  - [x] Configurat reverse proxy
-  - [x] Reprezentat sistem ca diagramă
+  - [x] **Creat instanță virtuală** pe Railway Cloud Platform
+  - [x] **Copiat aplicația** prin GitHub integration
+  - [x] **Pornit aplicația** - serviciul rulează pe `https://web-production-190d4.up.railway.app`
+  - [x] **Configurat environment variables** (PORT, NODE_ENV, DW_HOST)
+  - [x] **Reprezentat sistem ca diagramă** (vezi secțiunea "Arhitectură Cloud")
+  - [x] **Testat deployment-ul** - toate endpoint-urile funcționează
 
-- [ ] **Sarcină adițională**: CI/CD cu GitHub Actions
-- [ ] **Sarcină adițională**: Containerizare cu Docker
-- [ ] **Sarcină adițională**: Integrare Cloud services (Redis managed)
-- [ ] **Sarcină adițională**: Infrastructure as Code (Terraform)
+### 📝 **Sarcini adiționale (opționale - +1 punct fiecare):**
+
+- [ ] **Sarcină adițională 1**: CI/CD cu GitHub Actions
+- [ ] **Sarcină adițională 2**: Containerizare cu Docker
+- [ ] **Sarcină adițională 3**: Integrare Cloud services (Redis managed)
+- [ ] **Sarcină adițională 4**: Infrastructure as Code (Terraform)
 
 ## Referințe
 
