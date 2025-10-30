@@ -1,4 +1,5 @@
 const axios = require("axios");
+const https = require("https");
 const config = require("../../config/config");
 const logger = require("../../utils/logger");
 
@@ -79,6 +80,10 @@ class RoundRobinBalancer {
         headers: this.prepareHeaders(req),
         timeout: config.loadBalancer.maxRetries * 1000,
         validateStatus: () => true,
+        // Allow self-signed certificates for Railway internal networking
+        httpsAgent: new https.Agent({
+          rejectUnauthorized: false
+        })
       };
 
       if (req.method !== "GET" && req.body) {
@@ -127,6 +132,8 @@ class RoundRobinBalancer {
         method: req.method,
         url: `${server.url}${req.originalUrl || req.url}`,
         error: error.message,
+        errorCode: error.code,
+        errorResponse: error.response?.status,
         responseTime: `${responseTime}ms`,
       });
 
