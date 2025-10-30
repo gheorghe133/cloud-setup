@@ -7,9 +7,13 @@ class RoundRobinBalancer {
     this.servers = servers.map((server) => {
       // Use HTTPS for port 443, HTTP otherwise
       const protocol = server.port === 443 ? 'https' : 'http';
+      // Don't include port in URL if it's the default port (80 for HTTP, 443 for HTTPS)
+      const portSuffix = (protocol === 'https' && server.port === 443) || (protocol === 'http' && server.port === 80)
+        ? ''
+        : `:${server.port}`;
       return {
         ...server,
-        url: `${protocol}://${server.host}:${server.port}`,
+        url: `${protocol}://${server.host}${portSuffix}`,
         isHealthy: true,
         lastHealthCheck: null,
         consecutiveFailures: 0,
