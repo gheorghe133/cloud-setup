@@ -18,6 +18,7 @@ Data Warehouse (data-warehouse.up.railway.app:8080)
 ```
 
 **Features:**
+
 - Load Balancing (Round-Robin)
 - Response Caching (TTL-based)
 - Health Checks
@@ -44,6 +45,7 @@ git push origin main
 ### Pas 3: Configurare Environment Variables
 
 În Railway Dashboard → Variables:
+
 ```bash
 NODE_ENV=production
 PORT=$PORT  # Railway setează automat
