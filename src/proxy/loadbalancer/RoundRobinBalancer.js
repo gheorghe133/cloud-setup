@@ -294,40 +294,6 @@ class RoundRobinBalancer {
     };
   }
 
-  addServer(serverConfig) {
-    const server = {
-      ...serverConfig,
-      url: `http://${serverConfig.host}:${serverConfig.port}`,
-      isHealthy: true,
-      lastHealthCheck: null,
-      consecutiveFailures: 0,
-      totalRequests: 0,
-      successfulRequests: 0,
-      averageResponseTime: 0,
-    };
-
-    this.servers.push(server);
-
-    logger.info("Server added to load balancer", { url: server.url });
-  }
-
-  removeServer(url) {
-    const index = this.servers.findIndex((server) => server.url === url);
-
-    if (index !== -1) {
-      this.servers.splice(index, 1);
-
-      if (this.currentIndex >= this.servers.length) {
-        this.currentIndex = 0;
-      }
-
-      logger.info("Server removed from load balancer", { url });
-      return true;
-    }
-
-    return false;
-  }
-
   stopHealthChecks() {
     if (this.healthCheckInterval) {
       clearInterval(this.healthCheckInterval);

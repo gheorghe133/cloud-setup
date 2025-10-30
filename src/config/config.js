@@ -17,30 +17,6 @@ const config = {
     requestTimeout: process.env.PROXY_REQUEST_TIMEOUT || 60000,
   },
 
-  redis: {
-    host: process.env.REDIS_HOST || "localhost",
-    port: process.env.REDIS_PORT || 6379,
-    password: process.env.REDIS_PASSWORD || null,
-    db: process.env.REDIS_DB || 0,
-    retryDelayOnFailover: 100,
-    maxRetriesPerRequest: 3,
-    lazyConnect: true,
-  },
-
-  cassandra: {
-    contactPoints: process.env.CASSANDRA_HOSTS
-      ? process.env.CASSANDRA_HOSTS.split(",")
-      : ["localhost"],
-    localDataCenter: process.env.CASSANDRA_DC || "datacenter1",
-    keyspace: process.env.CASSANDRA_KEYSPACE || "warehouse",
-    username: process.env.CASSANDRA_USERNAME || null,
-    password: process.env.CASSANDRA_PASSWORD || null,
-    socketOptions: {
-      connectTimeout: 30000,
-      readTimeout: 30000,
-    },
-  },
-
   cache: {
     defaultTTL: process.env.CACHE_TTL || 300,
     maxSize: process.env.CACHE_MAX_SIZE || 1000,
