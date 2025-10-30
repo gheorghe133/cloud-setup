@@ -1,7 +1,3 @@
-/**
- * Configuration settings for the Web Proxy Lab
- */
-
 const config = {
   warehouse: {
     port: process.env.PORT || process.env.DW_PORT || 3000,

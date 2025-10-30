@@ -83,7 +83,7 @@ jobs:
 
       - name: Verify build
         run: |
-          echo "✅ Build verification successful"
+          echo "Build verification successful"
           echo "All dependencies installed correctly"
 
   deploy-status:
@@ -95,10 +95,9 @@ jobs:
     steps:
       - name: Deployment info
         run: |
-          echo "🚀 Deployment triggered by push to main"
+          echo "Deployment triggered by push to main"
           echo "Railway will auto-deploy the following services:"
           echo "  - Data Warehouse: https://data-warehouse.up.railway.app"
           echo "  - Reverse Proxy: https://reverse-proxy-server.up.railway.app"
           echo ""
-          echo "✅ CI/CD Pipeline completed successfully!"
-
+          echo "CI/CD Pipeline completed successfully"

@@ -1,183 +1,375 @@
-# Lab 3 - Cloud Deployment
+# Cloud-Based Data Warehouse with Reverse Proxy
 
 ![CI/CD Pipeline](https://github.com/gheorghe133/cloud-setup/actions/workflows/ci.yml/badge.svg)
 
-Web Proxy + Data Warehouse deployed pe **Railway.app**
+A distributed system implementing a RESTful Data Warehouse API with an intelligent Reverse Proxy layer, deployed on Railway.app cloud platform.
 
-## 🚀 Production URLs
+## Production Deployment
 
-✅ **Data Warehouse:** https://data-warehouse.up.railway.app
-✅ **Reverse Proxy:** https://reverse-proxy-server.up.railway.app
+**Data Warehouse API:** https://data-warehouse.up.railway.app  
+**Reverse Proxy Server:** https://reverse-proxy-server.up.railway.app
 
-**CI/CD Status:** Automated testing on every push ✅
-
-## Arhitectură
+## System Architecture
 
 ```
-Internet
-   ↓
-Reverse Proxy (reverse-proxy-server.up.railway.app:8080)
-   ↓ Private Network (web:8080)
-Data Warehouse (data-warehouse.up.railway.app:8080)
+┌─────────────────────────────────────────────────────────────────┐
+│                         Internet / Clients                       │
+│                    (HTTPS Requests via Railway)                  │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│              Reverse Proxy Server (Port 8080)                   │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │  Features:                                                │  │
+│  │  - Round-Robin Load Balancing                             │  │
+│  │  - Response Caching (TTL-based)                           │  │
+│  │  - Connection Pooling                                     │  │
+│  │  - Health Monitoring                                      │  │
+│  │  - Request/Response Logging                               │  │
+│  └───────────────────────────────────────────────────────────┘  │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             │ Private Network (web:8080)
+                             │ Railway Internal DNS
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│              Data Warehouse Server (Port 8080)                  │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │  REST API Endpoints:                                      │  │
+│  │  - GET    /employees       (List all)                     │  │
+│  │  - GET    /employees/:id   (Get by ID)                    │  │
+│  │  - PUT    /employees/:id   (Create)                       │  │
+│  │  - POST   /employees/:id   (Update)                       │  │
+│  │  - DELETE /employees/:id   (Delete)                       │  │
+│  │  - GET    /health          (Health check)                 │  │
+│  │                                                           │  │
+│  │  Storage: Thread-safe in-memory Map                       │  │
+│  │  Formats: JSON, XML                                       │  │
+│  └───────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-**Features:**
+## Key Features
 
-- Load Balancing (Round-Robin)
-- Response Caching (TTL-based)
-- Health Checks
-- HTTPS/SSL
-- Auto-deploy (GitHub → Railway)
+### Reverse Proxy
 
-## Deployment Steps
+- **Load Balancing:** Round-robin algorithm for request distribution
+- **Caching:** Intelligent response caching with configurable TTL
+- **Connection Management:** HTTP/HTTPS connection pooling
+- **Health Checks:** Periodic backend server health monitoring
+- **Metrics:** Real-time statistics and performance monitoring
 
-### Pas 1: Push la GitHub
+### Data Warehouse
 
-```bash
-git add .
-git commit -m "Lab 3: Railway deployment"
-git push origin main
-```
+- **RESTful API:** Complete CRUD operations for employee management
+- **Content Negotiation:** JSON and XML response formats
+- **Thread-Safe Storage:** Concurrent request handling
+- **Request Validation:** Input validation and error handling
+- **Logging:** Structured JSON logging for all operations
 
-### Pas 2: Deploy pe Railway
+## Technology Stack
 
-1. Mergi pe [railway.app](https://railway.app)
-2. Click **"New Project"** → **"Deploy from GitHub repo"**
-3. Selectează repository-ul `gheorghe133/cloud-setup`
-4. Railway detectează automat Node.js și folosește `Procfile`
+- **Runtime:** Node.js 16+
+- **Framework:** Express.js 4.x
+- **Cloud Platform:** Railway.app (PaaS)
+- **CI/CD:** GitHub Actions
+- **Testing:** Jest + Supertest
+- **Security:** Helmet.js, CORS
+- **Compression:** gzip compression
+- **Logging:** Morgan + Custom JSON logger
 
-### Pas 3: Configurare Environment Variables
+## Environment Configuration
 
-În Railway Dashboard → Variables:
+### Data Warehouse Service
 
 ```bash
 NODE_ENV=production
-PORT=$PORT  # Railway setează automat
+PORT=8080
 ```
 
-### Pas 4: Generează Public URL
-
-1. Settings → Networking → **"Generate Domain"**
-2. Primești URL: `https://web-production-190d4.up.railway.app`
-
-### Pas 5: Auto-Deploy
-
-✅ Orice push pe `main` → Railway redeploy automat!
-
-## Environment Variables
-
-### Data Warehouse Service (Production)
-
-```bash
-NODE_ENV=production
-# PORT is set automatically by Railway to 8080
-```
-
-### Reverse Proxy Service (Production)
+### Reverse Proxy Service
 
 ```bash
 NODE_ENV=production
 PORT=8080
 PROXY_HOST=0.0.0.0
-DW_SERVERS=web:8080  # Private networking to Data Warehouse
+DW_SERVERS=web:8080
 ```
 
-### Local Development
+## API Documentation
+
+### Data Warehouse Endpoints
+
+#### Health Check
 
 ```bash
-# Warehouse
-NODE_ENV=development
-DW_PORT=3000
+GET /health
+```
 
-# Proxy
-NODE_ENV=development
-PROXY_PORT=8080
-DW_SERVERS=localhost:3000
+Response:
+
+```json
+{
+  "status": "healthy",
+  "timestamp": "2025-10-30T12:00:00.000Z",
+  "uptime": 3600,
+  "version": "1.0.0"
+}
+```
+
+#### List All Employees
+
+```bash
+GET /employees
+```
+
+#### Get Employee by ID
+
+```bash
+GET /employees/:id
+```
+
+#### Create Employee
+
+```bash
+PUT /employees/:id
+Content-Type: application/json
+
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john.doe@example.com",
+  "department": "Engineering",
+  "position": "Software Engineer",
+  "salary": 75000
+}
+```
+
+#### Update Employee
+
+```bash
+POST /employees/:id
+Content-Type: application/json
+
+{
+  "salary": 80000
+}
+```
+
+#### Delete Employee
+
+```bash
+DELETE /employees/:id
+```
+
+### Reverse Proxy Endpoints
+
+#### Proxy Health Check
+
+```bash
+GET /proxy/health
+```
+
+#### Proxy Statistics
+
+```bash
+GET /proxy/stats
+```
+
+#### Clear Cache
+
+```bash
+DELETE /proxy/cache
 ```
 
 ## Testing
 
-### Test Data Warehouse Direct
+### Run Unit Tests
 
 ```bash
-# Health check
-curl https://data-warehouse.up.railway.app/health
-
-# GET all employees
-curl https://data-warehouse.up.railway.app/employees
-
-# GET specific employee (JSON)
-curl https://data-warehouse.up.railway.app/employees/1
-
-# GET employee (XML format)
-curl -H "Accept: application/xml" https://data-warehouse.up.railway.app/employees/1
-
-# CREATE employee
-curl -X PUT https://data-warehouse.up.railway.app/employees/new-id \
-  -H "Content-Type: application/json" \
-  -d '{"firstName":"John","lastName":"Doe","email":"john@example.com","department":"IT","position":"Developer","salary":50000}'
+npm test
 ```
 
-### Test prin Reverse Proxy
+### Run Tests with Coverage
 
 ```bash
-# Proxy health check
-curl https://reverse-proxy-server.up.railway.app/proxy/health
+npm run test:coverage
+```
 
-# GET employees prin proxy (cu caching)
-curl https://reverse-proxy-server.up.railway.app/employees
+### Test Results
 
-# Verifică cache headers
-curl -v https://reverse-proxy-server.up.railway.app/employees 2>&1 | grep -i "x-proxy-cache"
-# Output: x-proxy-cache: HIT (dacă e cached)
+```
+Test Suites: 2 passed, 2 total
+Tests:       17 passed, 17 total
+- Employee Model: 11 tests
+- Employee Service: 6 tests
+```
 
-# Proxy stats
-curl https://reverse-proxy-server.up.railway.app/proxy/stats
+## CI/CD Pipeline
+
+### GitHub Actions Workflow
+
+**Triggers:**
+
+- Push to `main` or `develop` branches
+- Pull requests to `main`
+
+**Jobs:**
+
+1. **Test** - Runs on Node.js 16.x, 18.x, 20.x
+
+   - Install dependencies
+   - Run unit tests
+   - Generate coverage reports
+
+2. **Lint** - Code quality checks
+
+   - Syntax validation
+
+3. **Build** - Verify build integrity
+
+   - Dependency installation verification
+
+4. **Deploy Status** - Deployment notification
+   - Railway auto-deploy information
+
+### Railway Auto-Deploy
+
+**Process:**
+
+1. Code pushed to `main` branch
+2. GitHub Actions runs automated tests
+3. Railway detects repository changes
+4. Automatic build and deployment (approximately 60 seconds)
+5. Health checks verify deployment success
+
+## Deployment
+
+### Prerequisites
+
+- Node.js 16+ installed
+- Railway.app account
+- GitHub repository
+
+### Deploy to Railway
+
+1. **Connect Repository**
+
+   ```bash
+   railway link
+   ```
+
+2. **Configure Environment Variables**
+
+   - Set variables in Railway Dashboard
+   - See Environment Configuration section above
+
+3. **Deploy**
+   ```bash
+   git push origin main
+   ```
+
+Railway will automatically detect the Node.js application and deploy using the Procfile configuration.
+
+## Local Development
+
+### Install Dependencies
+
+```bash
+npm install
+```
+
+### Run Data Warehouse
+
+```bash
+npm run start:warehouse
+```
+
+### Run Reverse Proxy
+
+```bash
+npm run start:proxy
+```
+
+### Run All Services
+
+```bash
+npm start
 ```
 
 ## Monitoring
 
-### Railway Dashboard
-
-- **Logs**: Real-time logs pentru fiecare service
-- **Metrics**: CPU, Memory, Network usage
-- **Deployments**: Istoric deploy-uri cu auto-deploy pe push
-
 ### Health Checks
 
 ```bash
-# Check warehouse health
+# Data Warehouse
 curl https://data-warehouse.up.railway.app/health
 
-# Check proxy health
+# Reverse Proxy
 curl https://reverse-proxy-server.up.railway.app/proxy/health
+```
 
-# Check load balancer stats
+### Performance Metrics
+
+```bash
+# Load balancer statistics
 curl https://reverse-proxy-server.up.railway.app/proxy/stats
 ```
 
 ## Cost Estimation
 
-Railway Free Tier:
+**Railway Free Tier:**
 
-- **$5 credit/lună** gratuit
-- **500 ore execution** (~20 zile 24/7)
-- **100GB bandwidth**
+- $5 credit per month
+- 500 execution hours (approximately 20 days 24/7)
+- 100GB bandwidth
 
-Servicii folosite:
+**Estimated Monthly Cost:**
 
-- Data Warehouse: ~$2.50/lună
-- Reverse Proxy: ~$2.50/lună
-- **Total**: ~$5/lună (GRATUIT cu credit)
-
-## Tech Stack
-
-- **Runtime:** Node.js 16+
-- **Framework:** Express.js
-- **Cloud:** Railway.app (PaaS)
-- **CI/CD:** GitHub integration
-- **Storage:** In-memory (thread-safe Map)
+- Data Warehouse: $2.50
+- Reverse Proxy: $2.50
+- **Total: $5.00** (covered by free tier credit)
 
 ## Repository
 
-**GitHub:** https://github.com/gheorghe133/cloud-setup
+**GitHub:** https://github.com/gheorghe133/cloud-setup  
+**License:** MIT
+
+## Project Structure
+
+```
+.
+├── .github/
+│   └── workflows/
+│       └── ci.yml                 # GitHub Actions CI/CD
+├── src/
+│   ├── client/
+│   │   └── client.js              # Test client
+│   ├── config/
+│   │   └── config.js              # Configuration
+│   ├── proxy/
+│   │   ├── cache/
+│   │   │   └── CacheManager.js
+│   │   ├── connections/
+│   │   │   └── ConnectionManager.js
+│   │   ├── loadbalancer/
+│   │   │   └── RoundRobinBalancer.js
+│   │   └── server.js              # Proxy server
+│   ├── utils/
+│   │   ├── logger.js
+│   │   └── responseFormatter.js
+│   └── warehouse/
+│       ├── controllers/
+│       │   └── EmployeeController.js
+│       ├── models/
+│       │   └── Employee.js
+│       ├── services/
+│       │   └── EmployeeService.js
+│       ├── storage/
+│       │   └── ThreadSafeStorage.js
+│       └── server.js              # Warehouse server
+├── Procfile                       # Railway deployment config
+├── railway.json                   # Railway build config
+└── package.json                   # Dependencies
+```
