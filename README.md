@@ -6,36 +6,48 @@ Migrarea proiectului Lab 2 (Web Proxy + Data Warehouse) în cloud folosind **Rai
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│ Railway Cloud Platform                                       │
+│ Railway Cloud Platform (PaaS)                                │
 │                                                               │
 │  ┌────────────────────────────────────────────────────────┐  │
 │  │ Service: web-production-190d4                          │  │
 │  │ ├─ Data Warehouse API                                  │  │
 │  │ ├─ Runtime: Node.js 16+                                │  │
-│  │ ├─ Port: $PORT (auto-assigned)                         │  │
+│  │ ├─ Port: $PORT (auto-assigned by Railway)             │  │
 │  │ ├─ Host: 0.0.0.0                                       │  │
+│  │ ├─ Features:                                           │  │
+│  │ │  ├─ CRUD Operations                                  │  │
+│  │ │  ├─ JSON/XML Support                                 │  │
+│  │ │  ├─ Health Monitoring                                │  │
+│  │ │  └─ Thread-safe Storage                              │  │
 │  │ └─ Status: ✅ RUNNING                                  │  │
 │  └────────────────────────────────────────────────────────┘  │
 │                              ▲                                │
 │                              │                                │
 │  ┌───────────────────────────┴─────────────────────────────┐ │
-│  │ Public URL (HTTPS)                                      │ │
+│  │ Public URL (HTTPS with SSL)                            │ │
 │  │ https://web-production-190d4.up.railway.app             │ │
-│  │ ├─ GET  /health                                         │ │
-│  │ ├─ GET  /employees                                      │ │
-│  │ ├─ GET  /employees/:id                                  │ │
-│  │ ├─ PUT  /employees/:id                                  │ │
-│  │ ├─ POST /employees/:id                                  │ │
-│  │ └─ DELETE /employees/:id                                │ │
+│  │                                                          │ │
+│  │ API Endpoints:                                          │ │
+│  │ ├─ GET  /health          → Health check                │ │
+│  │ ├─ GET  /employees       → List all employees          │ │
+│  │ ├─ GET  /employees/:id   → Get employee by ID          │ │
+│  │ ├─ PUT  /employees/:id   → Create employee             │ │
+│  │ ├─ POST /employees/:id   → Update employee             │ │
+│  │ └─ DELETE /employees/:id → Delete employee             │ │
 │  └─────────────────────────────────────────────────────────┘ │
 │                                                               │
 │  ┌────────────────────────────────────────────────────────┐  │
-│  │ GitHub Integration                                     │  │
+│  │ GitHub Integration (CI/CD)                             │  │
 │  │ Repository: gheorghe133/cloud-setup                    │  │
 │  │ Branch: main                                           │  │
-│  │ Auto-deploy: ✅ Enabled                                │  │
+│  │ Auto-deploy: ✅ Enabled (push to main = auto deploy)  │  │
+│  │ Build: Nixpacks (auto-detected Node.js)               │  │
 │  └────────────────────────────────────────────────────────┘  │
 └──────────────────────────────────────────────────────────────┘
+
+Note: Reverse Proxy code is implemented in src/proxy/ and can be
+deployed as a separate service or run locally for load balancing
+and caching features.
 ```
 
 ## Servicii Deploy-ate
