@@ -4,16 +4,20 @@ const logger = require("../../utils/logger");
 
 class RoundRobinBalancer {
   constructor(servers = config.warehouseServers) {
-    this.servers = servers.map((server) => ({
-      ...server,
-      url: `http://${server.host}:${server.port}`,
-      isHealthy: true,
-      lastHealthCheck: null,
-      consecutiveFailures: 0,
-      totalRequests: 0,
-      successfulRequests: 0,
-      averageResponseTime: 0,
-    }));
+    this.servers = servers.map((server) => {
+      // Use HTTPS for port 443, HTTP otherwise
+      const protocol = server.port === 443 ? 'https' : 'http';
+      return {
+        ...server,
+        url: `${protocol}://${server.host}:${server.port}`,
+        isHealthy: true,
+        lastHealthCheck: null,
+        consecutiveFailures: 0,
+        totalRequests: 0,
+        successfulRequests: 0,
+        averageResponseTime: 0,
+      };
+    });
 
     this.currentIndex = 0;
     this.healthCheckInterval = null;
