@@ -1,2 +1,2 @@
-web: node src/warehouse/server.js
+web: node start.js
 
